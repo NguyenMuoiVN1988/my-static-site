@@ -55,7 +55,7 @@
                     ul.innerHTML = '<li>Không có dữ liệu người dùng</li>'
                     return
                 }
-                
+                console.log('Data trả về từ API:', data)
                 data.forEach(user => {
                     const li = document.createElement('li')
                     li.innerHTML = `
