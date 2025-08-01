@@ -21,22 +21,32 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-   <script>
-  async function loadStudents() {
-    const response = await fetch('/api/users')
-    const data = await response.json()
+  <script>
+  async function loadUsers() {
+    const ul = document.getElementById('user-list')
 
-    const ul = document.getElementById('users-list')
-    ul.innerHTML = ''
+    try {
+      const response = await fetch('/api/users')
 
-    data.forEach(user => {
-      const li = document.createElement('li')
-      li.textContent = `${users.name} (${users.email} tuổi)`
-      ul.appendChild(li)
-    })
+      if (!response.ok) {
+        throw new Error(`Lỗi server: ${response.status}`)
+      }
+
+      const data = await response.json()
+
+      ul.innerHTML = ''
+      data.forEach(user => {
+        const li = document.createElement('li')
+        li.textContent = `${user.name} (${user.age})`
+        ul.appendChild(li)
+      })
+    } catch (err) {
+      ul.innerHTML = `<li>Lỗi: ${err.message}</li>`
+      console.error('Lỗi khi gọi API:', err)
+    }
   }
 
-  loadStudents()
+  loadUsers()
 </script>
 </body>
 </html> 
