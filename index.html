@@ -21,32 +21,60 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <script>
-  async function loadUsers() {
-    const ul = document.getElementById('user-list')
+<div class="container">
+        <h1>Danh sách Học sinh</h1>
+        <ul id="user-list">
+            <li class="loading">Đang tải dữ liệu...</li>
+        </ul>
+    </div>
 
-    try {
-      const response = await fetch('/api/users')
-
-      if (!response.ok) {
-        throw new Error(`Lỗi server: ${response.status}`)
-      }
-
-      const data = await response.json()
-
-      ul.innerHTML = ''
-      data.forEach(user => {
-        const li = document.createElement('li')
-        li.textContent = `${user.name} (${user.age})`
-        ul.appendChild(li)
-      })
-    } catch (err) {
-      ul.innerHTML = `<li>Lỗi: ${err.message}</li>`
-      console.error('Lỗi khi gọi API:', err)
-    }
-  }
-
-  loadUsers()
-</script>
+    <script>
+        async function loadUsers() {
+            const ul = document.getElementById('user-list')
+            
+            try {
+                console.log('Đang gọi API...')
+                const response = await fetch('/api/users')
+                
+                console.log('Response status:', response.status)
+                console.log('Response headers:', response.headers)
+                
+                if (!response.ok) {
+                    // Thử đọc response text để debug
+                    const errorText = await response.text()
+                    console.error('Error response:', errorText)
+                    throw new Error(`Lỗi server: ${response.status} - ${errorText}`)
+                }
+                
+                const data = await response.json()
+                console.log('Dữ liệu nhận được:', data)
+                
+                ul.innerHTML = ''
+                
+                if (data.length === 0) {
+                    ul.innerHTML = '<li>Không có dữ liệu người dùng</li>'
+                    return
+                }
+                
+                data.forEach(user => {
+                    const li = document.createElement('li')
+                    li.innerHTML = `
+                        <strong>${user.name}</strong><br>
+                        Email: ${user.email}<br>
+                        Mã học sinh: ${user.student_id}<br>
+                        Lớp: ${user.class}
+                    `
+                    ul.appendChild(li)
+                })
+                
+            } catch (err) {
+                console.error('Lỗi khi gọi API:', err)
+                ul.innerHTML = `<li class="error">Lỗi: ${err.message}</li>`
+            }
+        }
+        
+        // Gọi hàm khi trang đã load
+        document.addEventListener('DOMContentLoaded', loadUsers)
+    </script>
 </body>
 </html> 
