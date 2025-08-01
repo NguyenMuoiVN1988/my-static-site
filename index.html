@@ -47,25 +47,27 @@
                 }
                 
                 const data = await response.json()
-                console.log('Dữ liệu nhận được:', data)
+                const result = await response.json()
+                console.log('Data trả về từ API:', result)
+
+                const users = result.data // 👈 data phải là mảng
+
+            if (Array.isArray(users)) {
+                  users.forEach(user => {
+        const li = document.createElement('li')
+            li.innerHTML = `
+      <strong>${user.name}</strong><br>
+      Email: ${user.email}<br>
+      Mã học sinh: ${user.student_id}<br>
+      Lớp: ${user.class}
+    `
+    ul.appendChild(li)
+          })
+} else {
+  console.error('Không có dữ liệu học sinh trong result.data')
+}
+              
                 
-                ul.innerHTML = ''
-                
-                if (data.length === 0) {
-                    ul.innerHTML = '<li>Không có dữ liệu người dùng</li>'
-                    return
-                }
-                console.log('Data trả về từ API:', data)
-                data.forEach(user => {
-                    const li = document.createElement('li')
-                    li.innerHTML = `
-                        <strong>${user.name}</strong><br>
-                        Email: ${user.email}<br>
-                        Mã học sinh: ${user.student_id}<br>
-                        Lớp: ${user.class}
-                    `
-                    ul.appendChild(li)
-                })
                 
             } catch (err) {
                 console.error('Lỗi khi gọi API:', err)
