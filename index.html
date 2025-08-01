@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Panel - Quản lý Câu hỏi Toán</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- MathJax -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['\\(', '\\)'], ['$', '$']],
+                displayMath: [['\\[', '\\]'], ['$$', '$$']]
+            },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js"></script>
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <div id="sidebar-container"></div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Dashboard Section -->
+            <div id="dashboard-container"></div>
+
+            <!-- Questions Management Section -->
+            <div id="questions-container"></div>
+
+            <!-- Add Question Section -->
+            <div id="add-container"></div>
+
+            <!-- Stats Section -->
+            <div id="stats-container"></div>
+
+            <!-- Hierarchy Section -->
+            <div id="hierarchy-container"></div>
+
+            <!-- Settings Section -->
+            <div id="settings-container"></div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="modal-container"></div>
+
+    <!-- JavaScript -->
+    <script src="js/config.js"></script>
+    <script src="js/database-manager.js"></script>
+    <script src="js/dashboard.js"></script>
+    <script src="js/questions.js"></script>
+    <script src="js/add-question.js"></script>
+    <script src="js/hierarchy.js"></script>
+    <script src="js/settings.js"></script>
+    
+    <script>
+        // Load components
+        async function loadComponent(containerId, componentPath) {
+            try {
+                const response = await fetch(componentPath);
+                const html = await response.text();
+                document.getElementById(containerId).innerHTML = html;
+            } catch (error) {
+                console.error(`Error loading component ${componentPath}:`, error);
+            }
+        }
+
+        // Load all components
+        async function loadAllComponents() {
+            await Promise.all([
+                loadComponent('sidebar-container', 'components/sidebar.html'),
+                loadComponent('dashboard-container', 'components/dashboard.html'),
+                loadComponent('questions-container', 'components/questions.html'),
+                loadComponent('add-container', 'components/add-question.html'),
+                loadComponent('stats-container', 'components/stats.html'),
+                loadComponent('hierarchy-container', 'components/hierarchy.html'),
+                loadComponent('settings-container', 'components/settings.html'),
+                loadComponent('modal-container', 'components/modal.html')
+            ]);
+        }
+
+        // Initialize
+        window.addEventListener('load', async () => {
+            await loadAllComponents();
+            
+            // Auto-load stats if connection is available
+            setTimeout(() => {
+                if (window.supabaseClient) {
+                    if (typeof loadStats === 'function') {
+                        loadStats();
+                    }
+                    if (typeof initHierarchy === 'function') {
+                        initHierarchy();
+                    }
+                    if (typeof initAddQuestion === 'function') {
+                        initAddQuestion();
+                    }
+                }
+            }, 1000);
+        });
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('editModal');
+            if (event.target === modal) {
+                if (typeof closeModal === 'function') {
+                    closeModal();
+                }
+            }
+        }
+    </script>
+</body>
+</html> 
