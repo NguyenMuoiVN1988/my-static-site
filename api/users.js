@@ -1,39 +1,23 @@
-// api/uesers.js
-const { createClient } = require('@supabase/supabase-js')
-
+// api/test-both-keys.js
 module.exports = async (req, res) => {
-  try {
-    // Kiểm tra environment variables
-    const supabaseUrl = process.env.SUPABASE_URL
-    const supabaseKey = process.env.SUPABASE_KEY
-    
-    if (!supabaseUrl || !supabaseKey) {
-      return res.status(500).json({ 
-        error: 'Missing Supabase configuration',
-        details: {
-          hasUrl: !!supabaseUrl,
-          hasKey: !!supabaseKey
-        }
-      })
-    }
-
-    const supabase = createClient(supabaseUrl, supabaseKey)
-    
-    // Chỉ cho phép GET request
-    if (req.method !== 'GET') {
-      return res.status(405).json({ error: 'Method not allowed' })
-    }
-
-    const { data, error } = await supabase.from('users').select('*')
-    
-    if (error) {
-      console.error('Supabase error:', error)
-      return res.status(500).json({ error: error.message })
-    }
-
-    res.status(200).json(data)
-  } catch (err) {
-    console.error('Server error:', err)
-    res.status(500).json({ error: 'Internal server error', details: err.message })
-  }
+  const supabaseUrl = process.env.SUPABASE_URL
+  const supabaseKey = process.env.SUPABASE_KEY
+  const supabaseAnonKey = process.env.SUPABASE_ANON_KEY
+  
+  res.status(200).json({
+    message: 'Testing both key names',
+    results: {
+      SUPABASE_URL: !!supabaseUrl,
+      SUPABASE_KEY: !!supabaseKey,
+      SUPABASE_ANON_KEY: !!supabaseAnonKey
+    },
+    previews: {
+      url: supabaseUrl ? supabaseUrl.substring(0, 30) + '...' : 'NOT SET',
+      key: supabaseKey ? supabaseKey.substring(0, 20) + '...' : 'NOT SET',
+      anonKey: supabaseAnonKey ? supabaseAnonKey.substring(0, 20) + '...' : 'NOT SET'
+    },
+    allSupabaseKeys: Object.keys(process.env).filter(key => 
+      key.toLowerCase().includes('supabase')
+    )
+  })
 }
